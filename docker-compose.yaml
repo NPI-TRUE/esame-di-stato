@@ -1,0 +1,19 @@
+version: '3'
+services:
+  python-server:
+    image: python:3.8
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python3 -m http.server
+    ports:
+      - 8000:8000
+    depends_on:
+      - node-server
+
+  node-server:
+    image: node:14
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: node server.js
