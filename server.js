@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
+const { Console } = require('console');
 const app = express();
 const sqlite3 = require('sqlite3').verbose();
 
@@ -29,6 +30,11 @@ app.use(cors());
 
 
 app.post('/add-node', (req, res) => {
+
+  if (req.body.source == "ESAME" && req.body.target == "ESAME") {
+    res.status(400).send("Impossibile");
+    return;
+  }
 
   const control = db.prepare("SELECT 1 FROM nodes WHERE node = ?")
   control.get(req.body.source, (err, row) => {
