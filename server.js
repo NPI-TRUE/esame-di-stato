@@ -7,15 +7,18 @@ const sqlite3 = require('sqlite3').verbose();
 app.use(express.json());
 
 
-const db = new sqlite3.Database('nodes.db');
+const db = new sqlite3.Database('graph.db');
 
 db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS edges (
+      id INT PRIMARY KEY,
+      source TEXT,
+      target TEXT
+  )`);
+
   db.run(`CREATE TABLE IF NOT EXISTS nodes (
       id INT PRIMARY KEY,
-      node TEXT,
-      source TEXT,
-      target TEXT,
-      FOREIGN KEY (target) REFERENCES employees(node)
+      node TEXT
   )`);
 
   db.run(`INSERT INTO nodes (node) VALUES ('ESAME')`);
@@ -26,8 +29,46 @@ app.use(cors());
 
 
 app.post('/add-node', (req, res) => {
-  const stmt = db.prepare("INSERT INTO nodes (node, source, target) VALUES (?, ?, ?)");
-  stmt.run(req.body.target, req.body.source, req.body.target);
+
+  const control = db.prepare("SELECT 1 FROM nodes WHERE node = ?")
+  control.get(req.body.source, (err, row) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const sourceExists = !!row;
+
+    if (!sourceExists) {
+      const query = db.prepare("INSERT INTO nodes (node) VALUES (?)");
+      query.run(req.body.source, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
+    }
+  });
+
+  control.get(req.body.target, (err, row) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const targetExists = !!row;
+    
+    if (!targetExists) {
+      const query = db.prepare("INSERT INTO nodes (node) VALUES (?)");
+      query.run(req.body.target, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
+    }
+  });
+
+  const query = db.prepare("INSERT INTO edges (source, target) VALUES (?, ?)");
+  query.run(req.body.target, req.body.source);
 
   res.status(200).send('Node added');
 });
@@ -36,24 +77,32 @@ app.post('/remove-node', (req, res) => {
   if (req.body.node === 'ESAME') {
     res.status(400).send('Cannot remove ESAME');
   } else {
-    const stmt = db.prepare("DELETE FROM nodes WHERE node = ? or source = ? or target = ?");
-    stmt.run(req.body.node, req.body.node, req.body.node);
+    let stmt = db.prepare("DELETE FROM nodes WHERE node = ?");
+    stmt.run(req.body.node);
+
+    stmt = db.prepare("DELETE FROM edges WHERE source = ? or target = ?")
+    stmt.run(req.body.node, req.body.node)
     res.status(200).send('Node removed');
   }
 });
 
 app.post('/get-nodes', (req, res) => {
-  db.all("SELECT * FROM nodes", (err, rows) => {
+  db.all("SELECT * FROM edges", (err, edges) => {
     if (err) {
-      res.status(500).send('Internal Server Error');
-    } else {
-      res.status(200).send(rows);
+      return res.status(500).send('Internal Server Error');
     }
+
+    db.all("SELECT * FROM nodes", (err, nodes) => {
+      if (err) {
+        return res.status(500).send('Internal Server Error');
+      }
+
+      res.status(200).send([edges, nodes]);
+    });
   });
 });
-
 app.post('/get-nodes-name', (req, res) => {
-  db.all("SELECT DISTINCT node FROM nodes", (err, rows) => {
+  db.all("SELECT * FROM nodes", (err, rows) => {
     if (err) {
       res.status(500).send('Internal Server Error');
     } else {

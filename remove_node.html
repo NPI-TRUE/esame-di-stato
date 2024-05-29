@@ -67,7 +67,7 @@
                     node: selectedValue
                 };
             
-                fetch('http://localhost:3000/remove-node', {
+                fetch(window.location.protocol + '//' + window.location.hostname + ':3000/remove-node', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@
                         return;
                     }
 
-                    window.location = 'http://localhost:8000';
+                    window.location = '/';
                 })
                 .catch((error) => {
                     console.error('Error:', error);
@@ -98,7 +98,7 @@
             var dropdownList = document.querySelector('ul[role="listbox"]');
     
             async function getNodes() {
-                const response = await fetch('http://localhost:3000/get-nodes-name', {method: 'POST'});
+                const response = await fetch(window.location.protocol + '//' + window.location.hostname + ':3000/get-nodes-name', {method: 'POST'});
                 const data = await response.json();
     
                 const listbox = document.getElementById('ul-list');
@@ -139,8 +139,6 @@
                     li.appendChild(spanCheckmark);
     
                     listbox.appendChild(li);
-    
-                    console.log(li)
                 });
     
                  // Aggiungi un ascoltatore di eventi al pulsante

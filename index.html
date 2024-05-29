@@ -30,11 +30,11 @@
   <script>
 
     document.getElementById("link-add-node").addEventListener("click", function() {
-      window.location = "http://localhost:8000/add_node.html";
+      window.location.href = "/add_node.html";
     });
 
     document.getElementById("link-remove-node").addEventListener("click", function() {
-      window.location = "http://localhost:8000/remove_node.html";
+      window.location.href = "/remove_node.html";
     });
 
     // Funzione di trasformazione
@@ -42,14 +42,14 @@
       const elements = [];
 
       // Trasformazione dei nodi
-      customData.forEach(node => {
+      customData[1].forEach(node => {
         elements.push({
           data: { id: node.node }
         });
       });
 
       // Trasformazione degli archi
-      customData.forEach(link => {
+      customData[0].forEach(link => {
         if (link.source == null) return;
         
         elements.push({
@@ -61,12 +61,11 @@
     }
 
     async function load () {
-        const response = await fetch('http://localhost:3000/get-nodes', {
+        const response = await fetch(window.location.protocol + '//' + window.location.hostname + ':3000/get-nodes', {
             method: 'POST'
         });
         const data = await response.json();
         elements = transformData(data);
-        console.log(data, elements);
 
         // Initialize Cytoscape
         var cy = cytoscape({

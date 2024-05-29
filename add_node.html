@@ -70,8 +70,6 @@
             var inputValue = document.getElementById('price').value;
             newArgument = inputValue;
 
-            console.log(newArgument)
-
             if (selectedValue === null || newArgument === null) {
                 alert('Seleziona un argomento di partenza e uno da aggiungere');
                 span.style.display = 'none';
@@ -83,7 +81,7 @@
                 target: newArgument
             };
         
-            fetch('http://localhost:3000/add-node', {
+            fetch(window.location.protocol + '//' + window.location.hostname + ':3000/add-node', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +106,7 @@
         var dropdownList = document.querySelector('ul[role="listbox"]');
 
         async function getNodes() {
-            const response = await fetch('http://localhost:3000/get-nodes-name', {method: 'POST'});
+            const response = await fetch(window.location.protocol + '//' + window.location.hostname + ':3000/get-nodes-name', {method: 'POST'});
             const data = await response.json();
 
             const listbox = document.getElementById('ul-list');
@@ -149,8 +147,6 @@
                 li.appendChild(spanCheckmark);
 
                 listbox.appendChild(li);
-
-                console.log(li)
             });
 
              // Aggiungi un ascoltatore di eventi al pulsante
