@@ -90,7 +90,7 @@
             })
             .then(response => {
               span.style.display = 'none';
-              window.location = "http://localhost:8000";
+              window.location = window.location.protocol + '//' + window.location.hostname + ":8000";
             })
             .catch((error) => {
                 console.error('Error:', error);
