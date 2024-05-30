@@ -19,10 +19,10 @@ db.serialize(() => {
 
   db.run(`CREATE TABLE IF NOT EXISTS nodes (
       id INT PRIMARY KEY,
-      node TEXT
+      node TEXT UNIQUE
   )`);
 
-  db.run(`INSERT INTO nodes (node) VALUES ('ESAME')`);
+  db.run(`INSERT OR IGNORE INTO nodes (node) VALUES ('ESAME')`);
 });
 
 // Configura il middleware CORS

@@ -124,6 +124,19 @@
         ready: undefined,
         stop: undefined
         }).run();
+
+        cy.nodes().forEach((node) => {
+          let degree = node.degree()
+
+          console.log(node, degree)
+
+          let size = 20 + (degree + (degree * 0.8));
+
+          node.style({
+            "width": size,
+            "height": size
+          })
+        });
     }
 
     load();
