@@ -12,18 +12,42 @@
     }
     #cy {
       width: 100%;
-      height: 90vh;
+      height: 79vh;
       display: block;
       border: 1px solid #ccc;
       margin: 0px;
+    }
+
+    #description-box {
+      width: 90%;
+      height: 10vh;
+
+      display: block;
+
+      border: 1px solid #ccc;
+
+      margin-top: 10px;
+      margin-bottom: 10px;
+      margin-left: 5%;
+
+      border-radius: 20px;
+
+      padding: 20px;
+
+      overflow: auto;
     }
   </style>
 </head>
 <body>
   <div style="display: flex; flex-direction: row;">
     <button id="link-add-node" type="button" class="btn btn-success" style="margin: 20px; width: 100%;">Aggiungi nodo</button>
+    <button id="edit-node" type="button" class="btn btn-secondary" style="margin: 20px; width: 100%;">Modifica nodo</button>
     <button id="link-remove-node" type="button" class="btn btn-danger" style="margin: 20px; width: 100%;">Rimuovi nodo</button>
   </div>
+
+  <p id="description-box">
+    Descrizione dell'argomento selezionato
+  </p>
   
   <div id="cy"></div> <!-- Div where the graph will be rendered -->
 
@@ -31,6 +55,10 @@
 
     document.getElementById("link-add-node").addEventListener("click", function() {
       window.location.href = "/add_node.html";
+    });
+
+    document.getElementById("edit-node").addEventListener("click", function() {
+      window.location.href = "/edit_node.html";
     });
 
     document.getElementById("link-remove-node").addEventListener("click", function() {
@@ -44,7 +72,7 @@
       // Trasformazione dei nodi
       customData[1].forEach(node => {
         elements.push({
-          data: { id: node.node }
+          data: { id: node.node, description: node.description }
         });
       });
 
@@ -66,6 +94,8 @@
         });
         const data = await response.json();
         elements = transformData(data);
+
+        console.log(data[1])
 
         // Initialize Cytoscape
         var cy = cytoscape({
@@ -128,8 +158,6 @@
         cy.nodes().forEach((node) => {
           let degree = node.degree()
 
-          console.log(node, degree)
-
           let size = 20 + (degree + (degree * 0.8));
 
           node.style({
@@ -137,7 +165,18 @@
             "height": size
           })
         });
+
+        cy.on('tap', 'node', function(evt){
+        var node = evt.target;
+        var nodeId = node.id(); // Ottieni l'ID del nodo
+        var nodeDescription = node.data('description'); // Ottieni la descrizione del nodo
+
+        // Modifica il contenuto del div con id "description-box"
+        document.getElementById('description-box').innerHTML = nodeDescription != null ? nodeDescription : "Nessuna descrizione disponibile";
+      });
     }
+
+    
 
     load();
     

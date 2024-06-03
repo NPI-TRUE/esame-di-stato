@@ -19,7 +19,8 @@ db.serialize(() => {
 
   db.run(`CREATE TABLE IF NOT EXISTS nodes (
       id INT PRIMARY KEY,
-      node TEXT UNIQUE
+      node TEXT UNIQUE,
+      description TEXT
   )`);
 
   db.run(`INSERT OR IGNORE INTO nodes (node) VALUES ('ESAME')`);
@@ -31,52 +32,49 @@ app.use(cors());
 
 app.post('/add-node', (req, res) => {
 
+  if (req.body.source === null || req.body.target === "") {
+      res.status(400).send('Seleziona un argomento di partenza e uno da aggiungere');
+      span.style.display = 'none';
+      return;
+  }
+
   if (req.body.source == "ESAME" && req.body.target == "ESAME") {
-    res.status(400).send("Impossibile");
+    res.status(400).send("Impossibile aggiungere un collegamento tra ESAME e ESAME");
     return;
   }
 
-  const control = db.prepare("SELECT 1 FROM nodes WHERE node = ?")
-  control.get(req.body.source, (err, row) => {
+
+  const query = db.prepare("INSERT OR IGNORE INTO nodes (node, description) VALUES (?, ?)");
+
+  query.run(req.body.source, req.body.description, (err) => {
     if (err) {
       console.error(err);
-      return;
-    }
-
-    const sourceExists = !!row;
-
-    if (!sourceExists) {
-      const query = db.prepare("INSERT INTO nodes (node) VALUES (?)");
-      query.run(req.body.source, (err) => {
-        if (err) {
-          console.error(err);
-        }
-      });
     }
   });
 
-  control.get(req.body.target, (err, row) => {
+  query.run(req.body.target, req.body.description, (err) => {
     if (err) {
       console.error(err);
-      return;
-    }
-
-    const targetExists = !!row;
-    
-    if (!targetExists) {
-      const query = db.prepare("INSERT INTO nodes (node) VALUES (?)");
-      query.run(req.body.target, (err) => {
-        if (err) {
-          console.error(err);
-        }
-      });
     }
   });
 
-  const query = db.prepare("INSERT INTO edges (source, target) VALUES (?, ?)");
-  query.run(req.body.target, req.body.source);
+  const query_edge = db.prepare("INSERT INTO edges (source, target) VALUES (?, ?)");
+  query_edge.run(req.body.target, req.body.source);
 
   res.status(200).send('Node added');
+});
+
+app.post('/edit-node', (req, res) => {
+
+  if (req.body.node === 'ESAME') {
+    res.status(400).send('Impossibile modificare ESAME');
+    return;
+  }
+
+  const query = db.prepare("UPDATE nodes SET description = ? WHERE node = ?");
+  query.run(req.body.description, req.body.node);
+
+  res.status(200).send('Node updated');
 });
 
 app.post('/remove-node', (req, res) => {
