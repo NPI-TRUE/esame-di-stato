@@ -29,7 +29,8 @@
             </span>
           </button>
           <ul id="ul-list" class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm" tabindex="-1" role="listbox" aria-labelledby="listbox-label" aria-activedescendant="listbox-option-3">
-          </ul>
+            <input style="margin: 5px; width: 80%;" id="search-input" class="block w-full px-4 py-2 text-gray-800 border rounded-md  border-gray-300 focus:outline-none" type="text" placeholder="Search items" autocomplete="off">
+        </ul>
         </div>
 
         <div style="margin-top: 50px">
@@ -64,9 +65,7 @@
                 source: selectedValue,
                 target: document.getElementById('price').value,
                 description: document.getElementById('descriptionValue').value
-            };
-
-            console.log(data.description)
+            };)
         
             fetch(window.location.protocol + '//' + window.location.hostname + ':3000/add-node', {
                 method: 'POST',
@@ -197,6 +196,23 @@
         
         // Imposta lo stile 'display' a 'none'
         dropdownList.style.display = 'none';
+
+        const searchInput = document.getElementById('search-input');
+
+        // Add event listener to filter items based on input
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const items = document.getElementById('ul-list').querySelectorAll('ul[role="listbox"] li[role="option"]');
+            
+            items.forEach((item) => {
+                const text = item.querySelector('span').textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

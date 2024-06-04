@@ -42,6 +42,7 @@
   <div style="display: flex; flex-direction: row;">
     <button id="link-add-node" type="button" class="btn btn-success" style="margin: 20px; width: 100%;">Aggiungi nodo</button>
     <button id="edit-node" type="button" class="btn btn-secondary" style="margin: 20px; width: 100%;">Modifica nodo</button>
+    <button id="link-remove-edge" type="button" class="btn btn-danger" style="margin: 20px; width: 100%;">Rimuovi collegamento</button>
     <button id="link-remove-node" type="button" class="btn btn-danger" style="margin: 20px; width: 100%;">Rimuovi nodo</button>
   </div>
 
@@ -59,6 +60,10 @@
 
     document.getElementById("edit-node").addEventListener("click", function() {
       window.location.href = "/edit_node.html";
+    });
+
+    document.getElementById("link-remove-edge").addEventListener("click", function() {
+      window.location.href = "/remove_edge.html";
     });
 
     document.getElementById("link-remove-node").addEventListener("click", function() {
@@ -94,8 +99,6 @@
         });
         const data = await response.json();
         elements = transformData(data);
-
-        console.log(data[1])
 
         // Initialize Cytoscape
         var cy = cytoscape({

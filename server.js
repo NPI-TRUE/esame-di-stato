@@ -90,6 +90,18 @@ app.post('/remove-node', (req, res) => {
   }
 });
 
+app.post('/remove-edge', (req, res) => {
+
+  if (req.body.source == req.body.target) {
+    res.status(400).send('Impossibile rimuovere un collegamento tra lo stesso nodo');
+    return;
+  }
+
+  const query = db.prepare("DELETE FROM edges WHERE source = ? AND target = ? or source = ? AND target = ?");
+  query.run(req.body.source, req.body.target, req.body.target, req.body.source);
+  res.status(200).send('Edge removed');
+});
+
 app.post('/get-nodes', (req, res) => {
   db.all("SELECT * FROM edges", (err, edges) => {
     if (err) {
