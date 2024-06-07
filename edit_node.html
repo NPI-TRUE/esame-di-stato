@@ -29,7 +29,8 @@
             </span>
           </button>
           <ul id="ul-list" class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm" tabindex="-1" role="listbox" aria-labelledby="listbox-label" aria-activedescendant="listbox-option-3">
-          </ul>
+            <input style="margin: 5px; width: 80%;" id="search-input" class="block w-full px-4 py-2 text-gray-800 border rounded-md  border-gray-300 focus:outline-none" type="text" placeholder="Search items" autocomplete="off">
+        </ul>
         </div>
 
       <div class="form-group" style="margin-top: 50px;">
@@ -39,7 +40,7 @@
 
       <button id="send-button" type="button" class="btn btn-primary" style="margin-top: 50px">
         <span id="aggiungi-load" style="display: none;" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        Aggiungi collegamento
+        Modifica nodo
       </button>
 
 
@@ -75,6 +76,23 @@
             })
             .catch((error) => {
                 console.error('Error:', error);
+            });
+        });
+
+        const searchInput = document.getElementById('search-input');
+
+        // Add event listener to filter items based on input
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const items = document.getElementById('ul-list').querySelectorAll('ul[role="listbox"] li[role="option"]');
+            
+            items.forEach((item) => {
+                const text = item.querySelector('span').textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         });
     </script>
